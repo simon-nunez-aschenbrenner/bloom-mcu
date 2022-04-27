@@ -1,0 +1,111 @@
+BLOOM LORA ADDRESS SCHEME AND SETUP
+By Simon Aschenbrenner
+
+
+GENERAL
+
+The goal is to ensure unique addresses and reliable LoRa communication for all Bloom devices (hubs and sensors) in virtually every real world application.
+The setup process and main operation should be completely transparent to the user with minimal interaction needed and should "just work".
+
+A nodes LoRa address is encoded in 8 bits, which amounts to 256 possible addresses.
+We encode the hub in the 4 most significant bits and the sensor/zone in the 4 least significant bits.
+A hub's address has all 4 least significant bits set to 1.
+
+Each sensor is linked to a hub, meaning its 4 most significant bits are the address of its hub.
+The sensors 4 least significant bits (its zone ID) are predefined via jumpers on the GPIO pins, whereby a bit is 1 when a jumper is placed and 0 if not.
+Placement of the jumpers on the Adafruit Feather 32u4 LoRa is defined as follows:
+1st Bit (LSB): Pins  2 and  3
+2nd Bit:       Pins  5 and  6
+3rd Bit:       Pins 10 and 11
+4th Bit (MSB): Pins 12 and 13
+E.g. for zone ID 7 three jumpers would be placed between pins 2 and 3, pins 5 and 6 as well as between pins 12 and 13.
+There must never be more than 3 jumpers present, as all 4 bits set to 1 would define the hubs address.
+
+With the initial addresses (see below) blocked for assignment, there can be a maximum of 15 hubs (on one channel) and a maximum of 15 sensors/zones per hub.
+This may be changed in the future as there may be a need for more zones per hub (e.g. 7 hubs per channel and 31 zones per hub).
+But as of now this address scheme allows for 225 individual zones on one free channel.
+
+Hubs and sensors/zones are numbered from 0 to 14 (see below).
+As backend and app number them from 1 to 15, the IDs must be converted in transmission to and from the backend.
+
+
+SETUP
+
+The hub address is assigned automatically depending on availability and saved in the microcontroller's non volatile storage (NVS).
+It gets deleted at factory reset.
+
+At startup the hub validates if its saved address is still free via a call to its own address.
+If it get's answered, the hub awaits user interaction (e.g. a reset).
+In the future there should be a message to the backend/app as well.
+It would be very rare that the saved address would not be free after a reboot of the hub, as it would mean that another hub was initialized exactly during that time.
+A reset also means that all previously paired sensors (see below) must be re-paired again.
+
+If no address is saved in the NVS (meaning the hub has been reset or in initial factory condition), the hub checks all possible addresses (see below) one after another.
+When the call to the address doesn't get answered, the hub assigns itself that address.
+In the feature this mechanism should "overflow" into the next channel (Sensor setup would need to work identically).
+
+
+PAIRING
+
+Sensors are assigned to hubs utilizing the Received Signal Strength Indication (RSSI), which must match a specific threshold. *
+This means that sensors must be held close to the hub they should be assigned to after they have been turned on.
+After being turned on, each sensor sends a broadcast message with its ID encoded in its sender-address.
+This message is only answered by the hub that measures a high enough RSSI value and does not have a sensor/zone with the same ID already paired to it.
+The hub discloses its address in its sender-address, which causes the sensor to change the 4 most significant bits in its address accordingly (received_hub_address ∧ initial_sensor_address = assigned_sensor_address).
+From now on the sensor has a unique address will send messages only directly to the hub it was paired to.
+
+This implies that there should not be more than one hub in initial configuration, respectively without a linked sensor of the same ID, close to the sensor that need's to be set up.
+In the future there may be solution to avoid this extremely rare edge case of ambiguous hub-sensor-pairings programmatically as well.
+
+
+UNPAIRING
+
+Hubs will "forget" (unpair) sensors if a user deletes them in the app or if they don't "hear" from it for a specified amount of time.
+If a sensor gets unpaired by the hub, there should be a message to the backend/app one day as well.
+To preserve energy, a sensor will shut down automatically if its messages aren't acknowledged for a specified amount of time, too (meaning the hub is silent).
+
+Direct messages from an unpaired sensor (or one where their address doesn't match the hub's address) will be answered by the hub with an order to the sensor to shut down.
+Therefore sensors will always listen briefly for messages from the hub after sending a measurement and before going to sleep.
+This is the only time a sensor will be able to receive messages during normal operation, as it tries to preserve as much energy as possible by only being awake for a few seconds every hour.
+The hub must acknowledge messages by the sensor (as must the sensor with messages from the hub), but it is not required to send an answer afterwards.
+In the future, configuration changes or even software updates for the sensor may be sent via this mechanism as well.
+
+A sensor can be reset manually by powercycling it and can then be paired again (It will never forget its zone ID, as it is hardware encoded).
+To re-pair a reset sensor to a hub that already has a sensor with the same zone ID paired to it, the zone must first be deleted in the app or the silent time of that sensor must elapse.
+
+
+INITIAL ADDRESSES
+
+hub               = 1111 1111 = 255 (Broadcast address, no acknowledgements sent)
+sensor_of_zone_00 = 1111 0000 = 240
+sensor_of_zone_01 = 1111 0001 = 241
+sensor_of_zone_02 = 1111 0010 = 242
+sensor_of_zone_03 = 1111 0011 = 243
+...
+sensor_of_zone_14 = 1111 1110 = 254
+
+
+ASSIGNED HUB ADDRESSES
+
+hub_00 = 0000 1111 =  15
+hub_01 = 0001 1111 =  31
+hub_02 = 0010 1111 =  47
+hub_03 = 0011 1111 =  63
+...
+hub_14 = 1110 1111 = 239
+
+
+ASSIGNED SENSOR ADDRESSES
+
+sensor_of_zone_00_of_hub_00 = 0000 0000 =   0
+...
+sensor_of_zone_08_of_hub_01 = 0001 1000 =  24
+...
+sensor_of_zone_10_of_hub_02 = 0010 1010 =  42
+...
+sensor_of_zone_14_of_hub_14 = 1110 1110 = 238
+
+
+FOOTNOTES
+
+* This mechanism is inspired by various other IOT applications, for example the ESP-NOW pairing process as seen here: https://youtu.be/QmvMtgNs9r8?t=127
