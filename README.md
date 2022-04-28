@@ -1,0 +1,14 @@
+###### work in progress
+
+### Bloom
+**Automatisiertes Bewässerungssystem**
+
+Sourcecode und Dokumentation für den von mir verantworteten Teilbereich der Microcontrollerprogrammierung des Gruppenprojektes [Bloom](https://github.com/Alfonsomckenzy/Bloom) im 5. Studienplansemester.  
+In einem fünfköpfigen Team wurden innerhalb von 17 Wochen eine Systemarchitektur, Corporate und UI Design sowie funktionierende Software für ein REST-Serverbackend (Node.js, Express, MongoDB), eine Java Android App und zwei Microcontrollerarchitekturen (inkl. Hardwareprototypen) geschaffen, die es ermöglichen, die Bodenfeuchtigkeit verschiedener Gießzonen zu überwachen und diese entweder vollautomatisiert oder appgesteuert zu bewässern.  
+Besonderer Wert wurde auf eine einfache Bedienbarkeit bei Setup und täglicher Benutzung gelegt.
+
+Batteriebetriebene Sensoren messen die Bodenfeuchtigkeit und senden diese mittels LoRa an eine zentrale Steuereinheit (Hub), die diese wiederum an einen Webserver weitergibt und außerdem eine Wasserpumpe und mehrere Magnetventile regelt.  
+User können ihren Hub mit ihrer App (bzw. ihrem Useraccount) über einen einfachen Zahlencode, der auf dem Display des Hubs angezeigt wird, verbinden (siehe `doc/setup_activity_diagram.png`). Zuvor müssen sie den Hub nur mit dem eigenen WLAN verbinden. Ein benutzungsfreundliches Setup über WPS konnte aufgrund der Limitierungen von Micropython noch nicht umgesetzt werden. Der Rest des Hub-Setups erfolgt allerdings vollautomatisch und ist zudem über diverse Resetroutinen resilient gegenüber unerwarteten Fehlern. Außerdem wurde bei der Programmierung besonders auf Wiederverwendbarkeit durch Modularisierung geachtet.  
+Jeder Hub kann bis zu 15 Sensoren und Gießzonen verwalten und bis zu 15 Hubs können auf demselben LoRa-Kanal gleichzeitig mit ihren Sensoren kommunizieren (siehe `doc/lora_address_scheme_and_setup.txt`). Der Setupprozess, um einen Sensor mit einem Hub zu verbinden ist dabei völlig transparent für den/die Nutzer*in und erfolgt vollautomatisch durch Einschalten des Sensors und durch nahes an den Hub Halten (siehe `doc/lora_setup_activity_diagram.png`).  
+Anschließend empfängt der Hub regelmäßig die Sensordaten, gibt sie an das Serverbackend weiter und fragt von diesem die aktuellen Gießaufträge ab. Die Entscheidung, ob gegossen wird oder nicht, trifft der Server. Befindet sich noch genug Wasser im angeschlossenen Wassertank startet der Hub den Gießvorgang in der entsprechenden Gießzone und informiert das Backend in jedem Fall über den aktuellen Status.  
+Die Sensorsoftware ist funktional, aber noch nicht ausgereift und vermisst insbesondere noch Lösungen für eine bessere Energieffizienz.

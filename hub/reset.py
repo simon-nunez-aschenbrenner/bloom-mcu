@@ -50,9 +50,10 @@ def ask(message: str, wlan=False, lora=False):
 
 def reset(wlan=False, lora=False):
     """
-    # TODO rewrite docstring with counter and last reboot
     Reset the hub to factory conditions, just delete WLAN or LoRa configuration or simply reboot the hub.
     Clears the corresponding entries in the NVS and reboots afterwards.
+    To prevent endless reboot loops the number of reboots and the timestamp of the last reboot are stored in the NVS and evaluated.
+    This may cause the hub to enter an eternal deepsleep, if constants.MAX_REBOOT_ATTEMPTS are exceeded within constants.REBOOT_COUNTER_RESET_TIME.
 
     :param bool wlan: True if WLAN configuration should be deleted (needs to be True for factory reset and False for reboot without reset), default is False
     :param bool lora: True if LoRa configuration should be deleted (needs to be True for factory reset and False for reboot without reset), default is False

@@ -41,7 +41,7 @@
 // LoRa configuration
 #define SENSOR_0_ADDRESS 240
 #define BROADCAST_ADDRESS 255
-#define PREAMBLE "BLOOM" // TODO change
+#define PREAMBLE "BLOOM"
 #define FLAG_MEASUREMENT 0b0000
 #define FLAG_PAIRING_REQ 0b0001
 #define FLAG_PAIRING_ACK 0b0010
