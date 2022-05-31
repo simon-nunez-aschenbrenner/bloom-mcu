@@ -1,4 +1,4 @@
-![alt text](/img/bloom_logo.jpg "Bloom logo")
+![alt text](/img/bloom_logo.png "Bloom logo")
 
 **Automated irrigation system**  
 **Exercise project of fall/winter semester 2021 (5th study plan semester)**
