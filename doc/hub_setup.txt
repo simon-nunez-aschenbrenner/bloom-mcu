@@ -1,0 +1,117 @@
+GUIDE TO SETUP AN ESP32 AS A BLOOM BOX (HUB)
+On a Mac with Apple Silicon (M1 Pro)
+Author: Simon Aschenbrenner
+
+----------------------------------
+
+A. COMPILE FIRMWARE
+
+TODO: Exchange WPS relevant files
+TODO: Freeze Modules
+
+Guides:
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html
+https://github.com/micropython/micropython/blob/master/ports/esp32/README.md
+https://github.com/espressif/esp-idf/issues/6113#issuecomment-756335935
+
+1. Prerequisites
+
+1.1. Install Homebrew (https://brew.sh)
+>>> /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+1.2. Install and symlink Python 3
+>>> brew install python3
+>>> ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python
+>>> which -a python
+/opt/homebrew/bin/python
+/usr/bin/python
+
+Reopen Terminal window
+>>> python -V
+Python 3.x.x
+
+1.3. Install utilities
+>>> brew install cmake ninja dfu-util
+>>> xcode-select --install
+>>> sudo pip install pyserial
+>>> sudo pip install adafruit-ampy
+
+2. Bloom
+>>> cd ~
+>>> git clone https://github.com/simonaschenbrenner/bloom-mcu.git
+>>> cd bloom-mcu
+>>> mkdir esp mpy fw
+
+3. ESP-IDF
+>>> cd esp
+>>> git clone https://github.com/espressif/esp-idf.git
+>>> git -C esp-idf checkout v4.2
+>>> git -C esp-idf submodule update --init components/bt/host/nimble/nimble components/esp_wifi components/esptool_py/esptool components/lwip/lwip components/mbedtls/mbedtls components/bt/controller/lib
+Add the following after line 119 in ./esp-idf/tools/idf_tools.py (in PLATFORM_FROM_NAME dictionary): 'Darwin-arm64' : PLATFORM_MACOS,
+>>> ./esp-idf/install.sh
+>>> . ./esp-idf/export.sh
+
+4. Micropython
+>>> cd ../mpy
+>>> git clone https://github.com/micropython/micropython.git
+>>> cd micropython
+>>> make -C mpy-cross
+>>> cd ports/esp32
+>>> make submodules
+>>> make
+Will produce firmware image here: mpy/micropython/ports/esp32/build-GENERIC/firmware.bin
+
+5. Move firmware in our directory
+>>> mv micropython/ports/esp32/build-GENERIC/firmware.bin ../fw/
+
+----------------------------------
+
+B. REFLASH
+
+Guide:
+https://docs.espressif.com/projects/esptool/en/latest/esp32/advanced-topics/boot-mode-selection.html#boot-mode
+https://docs.micropython.org/en/latest/esp32/tutorial/intro.html#deploying-the-firmware
+
+1. Prerequisite: Install esptool
+>>> pip install esptool
+
+2. Enter Bootloader mode
+Tie GPIO0 and GPIO2 to ground as "ROM Serial Bootloader" mode is entered by booting/resetting with GPIO0 and GPIO2 held low
+
+3. Flash firmware
+>>> cd ~/Library/Python/3.8/bin
+>>> python esptool.py --chip esp32 --port /dev/tty.usbserial-0001 erase_flash
+>>> python esptool.py --chip esp32 --port /dev/tty.usbserial-0001 --baud 460800 write_flash -z 0x1000 ~/bloom-mcu/fw/firmware.bin 
+
+----------------------------------
+
+C. LOAD CODE AND DATA
+
+1. Prerequisite: Install Adafruit Ampy
+>>> pip install adafruit-ampy
+
+
+2. Ampy
+>>> cd ~/Library/Python/3.8/bin
+>>> python ampy -p /dev/tty.usbserial-0001 put ~/bloom-mcu/hub/main.py
+
+----------------------------------
+
+D. UTILITIES
+
+1. REPL
+Guide:
+https://docs.micropython.org/en/latest/esp8266/tutorial/repl.html
+https://docs.micropython.org/en/latest/reference/repl.html
+
+>>> screen /dev/tty.usbserial-0001 115200
+Soft reboot: crtl-d
+Exit screen: ctrl-a-k
+List of importable modules:
+>>> help('modules')
+
+2. List open screens
+>>> screen -list
+
+3. Ampy remove
+>>> python3 ampy -p /dev/tty.usbserial-0001 rm main.py
