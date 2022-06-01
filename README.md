@@ -55,6 +55,7 @@ Afterwards the user can setup watering zones through the app and by pairing a se
 The user can then see the zone's moisture level (as well as the sensor's battery level) and either water the zone manually or automatically when a specific threshold is reached.
 
 Some screenshots of our app can be seen in the (german) [presentation](/doc/bloom_presentation.pdf) of our project. Below is a picture of our final test setup.
+
 ![alt text](/img/bloom_prototype.png "Bloom prototype")
 
 ------------------------
