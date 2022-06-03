@@ -3,7 +3,7 @@
 **Automated irrigation system**  
 **Exercise project of fall/winter semester 2021 (5th study plan semester)**
 
-*Berlin University of Applied Sciences and Technology*  
+*Berliner Hochschule für Technik (Berlin University of Applied Sciences and Technology)*  
 *Project advisor: Dipl.-Ing. Erhard Buchberger*  
 *Team members: Albert Kaminski, Dominik Domonell, Jelena Mirceta, Sahiram Ravikumar, Simon Aschenbrenner*
 
@@ -12,7 +12,7 @@ Over the course of 17 weeks we defined goals through technology research and cus
 
 Please refer to our (german) [presentation](/doc/bloom_presentation.pdf) for an overview of the project or just keep on reading.
 
->This repository only contains source code and documentation regarding my own work, which centered around micro controller programming. The complete repository is private at the time of writing, but may be found [here](https://github.com/Alfonsomckenzy/Bloom) eventually.
+>This repository only contains source code and documentation regarding my own work, which centered around microprocessor programming. The complete repository is private at the time of writing, but may be found [here](https://github.com/Alfonsomckenzy/Bloom) eventually.
 
 ------------------------
 
@@ -35,12 +35,12 @@ For the hub (Bloom Box) we settled on the [Heltec WIFI LoRa 32 (V2)](https://hel
 
 ![alt text](/img/hub_ext.png "Bloom Box")
 
-The sensor is built around an [Adafruit Feather 32u4 RFM95 (868/915 MHz variant)](https://www.adafruit.com/product/3078) development board with a Semtech SX1276 LoRa radio and uses a capacitive soil moisture sensor, for better corrosion resistance than conductive sensors. Only version v2.0 of this unbranded, but popular sensor with the [TLC555](https://www.ti.com/lit/ds/symlink/tlc555.pdf) timing chip is compatible with the 3V logic on the Adafruit board. The 3.7V 2Ah LiPo battery is chargeable trough the Adafruit’s mini USB port and charging circuit.
+The sensor is built around an [Adafruit Feather 32u4 RFM95 LoRa Radio (868/915 MHz variant)](https://www.adafruit.com/product/3078) development board and uses a capacitive soil moisture sensor for better corrosion resistance than conductive sensors (Only version 2.0 of this unbranded, but popular moisture sensor with the [TLC555](https://www.ti.com/lit/ds/symlink/tlc555.pdf) timing chip is compatible with the 3V logic on the Adafruit board). The 3.7V 2Ah LiPo battery is chargeable trough the Adafruit’s Mini USB port and charging circuit.
 
 ![alt text](/img/sensor_ext.png "Bloom Sensor")
 
-A user controls their irrigation system through an Android app. A minimal setup consists of a water source, one hose, one Bloom Box and one Bloom Sensor. With our prototype hardware the hub still needs to be connected to a mains power supply to drive the 12V magnetic valves, but this could be substituted with solar power in the future. To warn the user in case the water tank runs empty, a float switch is integrated at the bottom and connected to the hub's micro controller.  
-The sensors are completely wireless. In a production environment the integrated battery should last at least a whole irrigation period (9 months) on a single charge by only measuring the moisture level once every hour and sleeping the rest of the time.
+A user controls their irrigation system through a smartphone running our app. A minimal setup consists of a water source, one hose, one Bloom Box and one Bloom Sensor. With our prototype hardware the hub still needs to be connected to a mains power supply to drive the 12V magnetic valves, although this could be substituted with a battery and solar power in the future. To warn the user in case the water tank runs empty, a float switch is integrated at its bottom and connected to the hub's microcontroller.  
+The sensors are completely wireless. In a production environment the integrated battery should last at least a whole irrigation period (about 9 months) on a single charge by only measuring the moisture level once every hour and sleeping the rest of the time.
 
 ------------------------
 
@@ -50,7 +50,7 @@ Minimal user data is required during setup. After setting up their Bloom Box wit
 To authenticate itself with the backend each Bloom Box gets assigned an unique `hub_id` and a random (and perhaps in the future changeable) `factory_key` during manufacturing (like an username and password).  
 The [setup activity diagram](/doc/setup_activity_diagram.png) explains this process in further detail.
 
-Afterwards the user can setup watering zones through the app and by pairing a sensor to their Bloom Box. For details on this process please refer to this [specification](/doc/lora_address_scheme_and_setup.txt), as well as the [LoRa activity diagram](/doc/lora_activity_diagram.png), which also illustrates the devices' radio communication during normal operation.
+Afterwards the user can setup watering zones through the app and by pairing a sensor to their Bloom Box. To pair a sensor the user must just switch it on and hold it next to the hub. For details on this process please refer to this [specification](/doc/lora_address_scheme_and_setup.txt), as well as the [LoRa activity diagram](/doc/lora_activity_diagram.png), which also illustrates the devices' radio communication during normal operation.
 
 The user can then see the zone's moisture level (as well as the sensor's battery level) and either water the zone manually or automatically when a specific threshold is reached.
 
@@ -69,7 +69,7 @@ Hubs will continuously listen for sensor measurement data, pass it on to the bac
 - Controls a pump and as many magnetic valves as configured in [`constants.py`](/hub/constants.py)
 - Senses an empty water tank, stops watering and messages the backend 
 - Displays messages directed at the user (e.g. a key for connecting with the user's account)
-- Has means of user interaction through two buttons (although one will always reboot the system)
+- Has means of user interaction through two buttons
 - Can be reset to factory conditions on the device itself or via the backend
 - Will automatically connect to the user's WiFi
 
@@ -79,7 +79,7 @@ The present workaround can be found in lines 200 and 201 in [`hub.py`](/hub/hub.
 - Sets its system time to UTC using `ntptime`
 - Authenticates and registers itself with the backend, asks which zones it should water and continuously updates its status on the server
 - Sets its LoRa address depending on availability (up to 15 Bloom Boxes on one LoRa channel, see [this specification](/doc/lora_address_scheme_and_setup.txt) and [activity diagram](/doc/lora_activity_diagram.png) for further details)
-- Manages up to 15 Bloom Sensors via LoRa
+- Manages up to 15 Bloom Sensors via LoRa (This results in up to 225 individual sensors on one channel)
 - Continuously listens for a paired sensor's moisture and battery measurements and passes them to the backend
 - Continuously listens for sensor pairing request and informs the backend in case a pairing was successful
 - Automatically unpairs silent sensors and deletes them on the backend
@@ -99,7 +99,7 @@ It is written for compatibility with the popular [RadioHead packet radio library
 
 The backend calls operate on the same encapsulation principle: The HTTPS request handler (adapted from [urequests.py by Paul Sokolovsky](https://github.com/micropython/micropython-lib/blob/master/python-ecosys/urequests)) is universal and gets called by the functions in [`backend.py`](/hub/backend.py) that prepare the payloads before transmit. **Please replace the files `key` and `cert` with your own SSL keys.**
 
-The water control logic can be found in [`watering.py`](/hub/watering.py), persistence through the ESP32's NVS is handled in [`nvs.py`](/hub/nvs.py) and all configuration data is stored in [`constants.py`](/hub/constants.py) (**Please enter your server's IP address there).**
+The water control logic can be found in [`watering.py`](/hub/watering.py), persistence through the ESP32's NVS is handled in [`nvs.py`](/hub/nvs.py) and all configuration data is stored in [`constants.py`](/hub/constants.py) (**Please enter your server's IP address there for example).**
 `logo` contains a representation of the Bloom logo suitable for the buffer used by the display driver in [`ssd1306.py`](/hub/ssd1306.py). The driver is virtually identical to [this one](https://github.com/micropython/micropython/blob/master/drivers/display/ssd1306.py) in the MicroPython repository.
 
 Below is a heavily simplified diagram of the hub's source code structure, that omits any cross connections.
@@ -131,7 +131,7 @@ main.py
 The Bloom Sensors' software is written as an Arduino Sketch in C++ and can be found here: [`sensor/sensor.ino`](/sensor/sensor.ino)  
 While fully functional the code is not yet matured and particularly misses solutions for better energy efficiency (e.g. deep sleep).  
 It utilizes the [RadioHead packet radio library](http://www.airspayce.com/mikem/arduino/RadioHead/index.html) (using `RHReliableDatagram` and the `RH_RF95` driver). All configuration data is defined on top of the script.  
-Sensors can be reset by power cycling and will automatically try to pair themselves to a hub after being turned on. Please refer to [this specification](/doc/lora_address_scheme_and_setup.txt) and [activity diagram](/doc/lora_activity_diagram.png) for further information regarding the setup using a lean custom protocol.
+Sensors can be reset by power cycling and will automatically try to pair themselves to a hub after being turned on. Please refer to [this specification](/doc/lora_address_scheme_and_setup.txt) and [activity diagram](/doc/lora_activity_diagram.png) for further information regarding their setup using a lean custom protocol.
 
 ![alt text](/img/sensor_int.png "Bloom Sensor")
 
@@ -139,10 +139,10 @@ Sensors can be reset by power cycling and will automatically try to pair themsel
 
 ## Miscellaneous
 
-- [`doc`](/doc/) has all the mentioned detailed specifications as well as an [installation guide](/doc/hub_setup.txt) to setup an ESP32 as a Bloom Box. It contains useful information for compiling the MicroPython firmware and flashing it on to the ESP32, as well as using [Ampy](https://learn.adafruit.com/micropython-basics-load-files-and-run-code/overview) and [REPL](https://docs.micropython.org/en/latest/reference/repl.html).
+- [`doc`](/doc/) has all the mentioned detailed specifications as well as an [installation guide](/doc/hub_setup.txt) to setup an ESP32 as a Bloom Box. It contains useful information for compiling the MicroPython firmware and flashing it on to the ESP32, as well as using [Ampy](https://learn.adafruit.com/micropython-basics-load-files-and-run-code/overview) to load code onto the hub's ESP32 and [REPL](https://docs.micropython.org/en/latest/reference/repl.html), the MicroPython interactive interpreter mode (or shell).
 - [`img`](/img/) contains the images used in this README.
 - [`misc`](/misc/) has a [script](/misc/hub_display_image_conversion.py) to convert a monochromatic image (like [`logo.png`](/misc/logo.png)) for the hub's display.
 
 ------------------------
 
-###### By Simon Aschenbrenner, 6/1/22
+###### By Simon Aschenbrenner, 6/2/22
