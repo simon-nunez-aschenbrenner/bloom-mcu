@@ -10,9 +10,9 @@
 We aimed to design an easy to use but still flexible and scalable irrigation system while learning about technologies and processes that were new to us.  
 Over the course of 17 weeks we defined goals through technology research and customer analysis, developed a system architecture, build functioning hard- and software prototypes and designed UX, UI and CI.
 
-Please refer to our (german) [presentation](/doc/bloom_presentation.pdf) for an overview of the project or just keep on reading.
+Please refer to our (german) [presentation](/misc/presentation.pdf) for an overview of the project or just keep on reading.
 
->This repository only contains source code and documentation regarding my own work, which centered around microprocessor programming. The complete repository is private at the time of writing, but may be found [here](https://github.com/Alfonsomckenzy/Bloom) eventually.
+>This repository only contains source code and documentation regarding my own work, which centered around microprocessor programming and UI/UX design. The complete repository is private at the time of writing, but may be found [here](https://github.com/Alfonsomckenzy/Bloom) eventually.
 
 ------------------------
 
@@ -46,7 +46,7 @@ The sensors are completely wireless. In a production environment the integrated 
 
 ## Setup and Use
 
-Minimal user data is required during setup. After setting up their Bloom Box with their water source (e.g. pump and water tank), the user registers it through the app on the backend (linking themselves to their Bloom Box). They enter their email address to setup an account and a nine digit `user_key` displayed on the hub‘s display. Each Bloom Box obtains this code from the backend through our custom API (please refer to [`backend.py`](/hub/backend.py) and [`constants.py`](/hub/constants.py) for the API calls used by the hub).  
+Minimal user data is required during setup. After setting up their Bloom Box with their water source (e.g. pump and water tank), the user registers it through the app on the backend (linking themselves to their Bloom Box): They enter their email address to setup an account and a nine digit `user_key` displayed on the hub‘s display. Each Bloom Box obtains this code from the backend through our custom API (please refer to [`backend.py`](/hub/backend.py) and [`constants.py`](/hub/constants.py) for the API calls used by the hub).  
 To authenticate itself with the backend each Bloom Box gets assigned an unique `hub_id` and a random (and perhaps in the future changeable) `factory_key` during manufacturing (like an username and password).  
 The [setup activity diagram](/doc/setup_activity_diagram.png) explains this process in further detail.
 
@@ -54,7 +54,7 @@ Afterwards the user can setup watering zones through the app and by pairing a se
 
 The user can then see the zone's moisture level (as well as the sensor's battery level) and either water the zone manually or automatically when a specific threshold is reached.
 
-Some screenshots of our app can be seen in the (german) [presentation](/doc/bloom_presentation.pdf) of our project. Below is a picture of our final prototype / test setup.
+All screens we developed for our app's user interface prototype are arranged here: [`/misc/app_ui_prototype.png`](/misc/app_ui_prototype.png). Below is a picture of our final prototype / test setup.
 
 ![alt text](/img/prototype.png "Bloom prototype")
 
@@ -99,7 +99,7 @@ It is written for compatibility with the popular [RadioHead packet radio library
 
 The backend calls operate on the same encapsulation principle: The HTTPS request handler (adapted from [urequests.py by Paul Sokolovsky](https://github.com/micropython/micropython-lib/blob/master/python-ecosys/urequests)) is universal and gets called by the functions in [`backend.py`](/hub/backend.py) that prepare the payloads before transmit. **Please replace the files `key` and `cert` with your own SSL keys.**
 
-The water control logic can be found in [`watering.py`](/hub/watering.py), persistence through the ESP32's NVS is handled in [`nvs.py`](/hub/nvs.py) and all configuration data is stored in [`constants.py`](/hub/constants.py) (**Please enter your server's IP address there for example).**
+The water control logic can be found in [`watering.py`](/hub/watering.py), persistence through the ESP32's non volatile storage is handled in [`nvs.py`](/hub/nvs.py) and all configuration data is stored in [`constants.py`](/hub/constants.py) (**Please enter your server's IP address there for example).**
 `logo` contains a representation of the Bloom logo suitable for the buffer used by the display driver in [`ssd1306.py`](/hub/ssd1306.py). The driver is virtually identical to [this one](https://github.com/micropython/micropython/blob/master/drivers/display/ssd1306.py) in the MicroPython repository.
 
 Below is a heavily simplified diagram of the hub's source code structure, that omits any cross connections.
@@ -141,8 +141,8 @@ Sensors can be reset by power cycling and will automatically try to pair themsel
 
 - [`doc`](/doc/) has all the mentioned detailed specifications as well as an [installation guide](/doc/hub_setup.txt) to setup an ESP32 as a Bloom Box. It contains useful information for compiling the MicroPython firmware and flashing it on to the ESP32, as well as using [Ampy](https://learn.adafruit.com/micropython-basics-load-files-and-run-code/overview) to load code onto the hub's ESP32 and [REPL](https://docs.micropython.org/en/latest/reference/repl.html), the MicroPython interactive interpreter mode (or shell).
 - [`img`](/img/) contains the images used in this README.
-- [`misc`](/misc/) has a [script](/misc/hub_display_image_conversion.py) to convert a monochromatic image (like [`logo.png`](/misc/logo.png)) for the hub's display.
+- [`misc`](/misc/) has a [script](/misc/hub_display_image_conversion.py) to convert a monochromatic image (like [`logo.png`](/misc/logo.png)) for the hub's display as well as the aforementioned (german) [project presentation](/misc/presentation.pdf) and [app UI prototype](/misc/app_ui_prototype.png).
 
 ------------------------
 
-###### By Simon Aschenbrenner, 6/2/22
+###### By Simon Aschenbrenner, 6/29/22
