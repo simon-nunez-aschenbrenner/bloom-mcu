@@ -5,7 +5,8 @@
 
 *Berliner Hochschule für Technik (Berlin University of Applied Sciences and Technology)*  
 *Project advisor: Dipl.-Ing. Erhard Buchberger*  
-*Team members: Albert Kaminski, Dominik Domonell, Jelena Mirceta, Sahiram Ravikumar, Simon Aschenbrenner*
+*Team members: Albert Kaminski, Dominik Domonell, Jelena Mirceta, Sahiram Ravikumar, Simon Núñez Aschenbrenner*
+*Bloom logo and illustrations: Melissa Akyıldız*
 
 We aimed to design an easy to use but still flexible and scalable irrigation system while learning about technologies and processes that were new to us.  
 Over the course of 17 weeks we defined goals through technology research and customer analysis, developed a system architecture, build functioning hard- and software prototypes and designed UX, UI and CI.
@@ -97,9 +98,9 @@ The MicroPython LoRa radio driver in [`radio.py`](/hub/radio.py) is based on [Ma
 It is written for compatibility with the popular [RadioHead packet radio library](http://www.airspayce.com/mikem/arduino/RadioHead/index.html) (that the sensor uses as well) and handles the Layer 3 routing and Layer 4 transport aspects of the LoRa communication according to RadioHead‘s reliable datagram implementation. Unacknowledged or encrypted datagrams can be used as well, but the latter one is untested.  
 [`sensors.py`](/hub/sensors.py) on the other hand defines Bloom-specific presentation and application level aspects of the LoRa communication.
 
-The backend calls operate on the same encapsulation principle: The HTTPS request handler (adapted from [urequests.py by Paul Sokolovsky](https://github.com/micropython/micropython-lib/blob/master/python-ecosys/urequests)) is universal and gets called by the functions in [`backend.py`](/hub/backend.py) that prepare the payloads before transmit. **Please replace the files `key` and `cert` with your own SSL keys.**
+The backend calls operate on the same encapsulation principle: The HTTPS request handler (adapted from [urequests.py by Paul Sokolovsky](https://github.com/micropython/micropython-lib/blob/master/python-ecosys/urequests)) is universal and gets called by the functions in [`backend.py`](/hub/backend.py) that prepare the payloads before transmit. **&rarr; Please replace the files `key` and `cert` with your own SSL keys.**
 
-The water control logic can be found in [`watering.py`](/hub/watering.py), persistence through the ESP32's non volatile storage is handled in [`nvs.py`](/hub/nvs.py) and all configuration data is stored in [`constants.py`](/hub/constants.py) (**Please enter your server's IP address there for example).**
+The water control logic can be found in [`watering.py`](/hub/watering.py), persistence through the ESP32's non volatile storage is handled in [`nvs.py`](/hub/nvs.py) and all configuration data is stored in [`constants.py`](/hub/constants.py) (**&rarr; Please enter your server's IP address there for example).**
 `logo` contains a representation of the Bloom logo suitable for the buffer used by the display driver in [`ssd1306.py`](/hub/ssd1306.py). The driver is virtually identical to [this one](https://github.com/micropython/micropython/blob/master/drivers/display/ssd1306.py) in the MicroPython repository.
 
 Below is a heavily simplified diagram of the hub's source code structure, that omits any cross connections.
@@ -145,4 +146,4 @@ Sensors can be reset by power cycling and will automatically try to pair themsel
 
 ------------------------
 
-###### By Simon Aschenbrenner, 6/29/22
+###### By Simon Núñez Aschenbrenner on May 3, 2024
