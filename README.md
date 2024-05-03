@@ -5,7 +5,7 @@
 
 *Berliner Hochschule für Technik (Berlin University of Applied Sciences and Technology)*  
 *Project advisor: Dipl.-Ing. Erhard Buchberger*  
-*Team members: Albert Kaminski, Dominik Domonell, Jelena Mirceta, Sahiram Ravikumar, Simon Núñez Aschenbrenner*
+*Team members: Albert Kaminski, Dominik Domonell, Jelena Mirceta, Sahiram Ravikumar, Simon Núñez Aschenbrenner*  
 *Bloom logo and illustrations: Melissa Akyıldız*
 
 We aimed to design an easy to use but still flexible and scalable irrigation system while learning about technologies and processes that were new to us.  
@@ -75,7 +75,7 @@ Hubs will continuously listen for sensor measurement data, pass it on to the bac
 - Will automatically connect to the user's WiFi
 
 > Currently there is no possibility for a WiFi setup by the user, as WPS is not yet supported by MicroPython's ESP32 port and a customized firmware with modified `modnetwork.c` and `network_wlan.c` files adapted from [this pull request](https://github.com/micropython/micropython/pull/4464) did not work as expected. Other solutions to setup the Hub's WiFi (e.g. via the user's phone) were not tried.  
-The present workaround can be found in lines 200 and 201 in [`hub.py`](/hub/hub.py): A predefined SSID and password get written to the NVS during setup, so they are always available, even after a reset. **Please change these two strings to your own SSID and password.**
+The present workaround can be found in lines 200 and 201 in [`hub.py`](/hub/hub.py): A predefined SSID and password get written to the NVS during setup, so they are always available, even after a reset. **&rarr; Please change these two strings to your own SSID and password.**
 
 - Sets its system time to UTC using `ntptime`
 - Authenticates and registers itself with the backend, asks which zones it should water and continuously updates its status on the server
